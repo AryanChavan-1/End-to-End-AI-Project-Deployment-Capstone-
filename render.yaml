@@ -1,9 +1,25 @@
 services:
+  # ── 1. FastAPI Backend ────────────────────────────────────────────────────
   - type: web
     name: churn-prediction-api
     runtime: docker
+    dockerfilePath: ./Dockerfile
     plan: free
     healthCheckPath: /health
     envVars:
       - key: MODEL_PATH
         value: model/churn_pipeline.pkl
+
+  # ── 2. Streamlit Frontend ─────────────────────────────────────────────────
+  - type: web
+    name: churn-prediction-ui
+    runtime: docker
+    dockerfilePath: ./Dockerfile.frontend
+    plan: free
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: API_URL
+        fromService:
+          name: churn-prediction-api
+          type: web
+          property: serviceURL
